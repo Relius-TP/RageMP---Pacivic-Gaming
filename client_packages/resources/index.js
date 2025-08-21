@@ -42,7 +42,7 @@ mp.events.add("playerEnterColshape", (shape) => {
     }
 });
 
-mp.keys.bind(0x45, true, function () {
+mp.keys.bind(0x45, true, function () { //Tekan E untuk save checkpoint
     if (checkpointPos) {
         let playerPos = mp.players.local.position;
         let dist = mp.game.system.vdist(
@@ -85,7 +85,7 @@ mp.events.add("render", () => {
 // =======================
 //  INVENTORY SYSTEM (TAB)
 // =======================
-mp.keys.bind(0x09, true, function () {
+mp.keys.bind(0x09, true, function () { // Tekan TAB untuk buka Inventori
     if (!inventoryOpen) {
         mp.events.callRemote("requestInventory");
     } else {

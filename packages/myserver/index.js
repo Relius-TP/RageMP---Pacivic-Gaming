@@ -112,7 +112,6 @@ mp.events.addCommand("drop", (player, fullText, itemName) => {
     player.outputChatBox(`Kamu membuang ${itemName}`);
 });
 
-// /inv -> list inventory
 mp.events.addCommand("inv", (player) => {
     if (player.inventory.length === 0) {
         player.outputChatBox("Inventory kosong!");
