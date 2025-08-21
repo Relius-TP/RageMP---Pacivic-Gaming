@@ -41,7 +41,7 @@ mp.events.addCommand("car", (player) => {
         }
     );
 
-    vehicle.rotation = new mp.Vector3(0, 0, player.heading); // mobil hadap sama kaya player
+    vehicle.rotation = new mp.Vector3(0, 0, player.heading);
     player.outputChatBox("Mobil dipanggil, ada di depanmu!");
 });
 
