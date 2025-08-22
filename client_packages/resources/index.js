@@ -7,18 +7,20 @@ let inventoryOpen = false;
 // =======================
 //  TAXI TRANSITION
 // =======================
-mp.events.add("startTaxiTransition", () => {
+function startTaxiTransition() {
     mp.game.cam.doScreenFadeOut(1000);
-});
+}
+mp.events.add("startTaxiTransition", startTaxiTransition);
 
-mp.events.add("endTaxiTransition", () => {
+function endTaxiTransition() {
     mp.game.cam.doScreenFadeIn(1000);
-});
+}
+mp.events.add("endTaxiTransition", endTaxiTransition);
 
 // =======================
 //  CHECKPOINT SYSTEM
 // =======================
-mp.events.add("showCheckpoint", () => {
+function showCheckpointHandler() {
     if (checkpoint) checkpoint.destroy();
     if (colshape) colshape.destroy();
 
@@ -32,60 +34,59 @@ mp.events.add("showCheckpoint", () => {
     });
 
     colshape = mp.colshapes.newSphere(checkpointPos.x, checkpointPos.y, checkpointPos.z, 3);
-
     mp.gui.chat.push("Pergi ke checkpoint dan tekan E untuk menyimpannya!");
-});
+}
+mp.events.add("showCheckpoint", showCheckpointHandler);
 
-mp.events.add("playerEnterColshape", (shape) => {
+function playerEnterColshapeHandler(shape) {
     if (shape === colshape) {
         mp.gui.chat.push("Tekan [E] untuk menyimpan checkpoint!");
     }
-});
+}
+mp.events.add("playerEnterColshape", playerEnterColshapeHandler);
 
-mp.keys.bind(0x45, true, function () { //Tekan E untuk save checkpoint
-    if (checkpointPos) {
-        let playerPos = mp.players.local.position;
-        let dist = mp.game.system.vdist(
-            playerPos.x, playerPos.y, playerPos.z,
-            checkpointPos.x, checkpointPos.y, checkpointPos.z
-        );
+function saveCheckpointHandler() {
+    if (!checkpointPos) return;
 
-        if (dist < 3.0) {
-            mp.events.callRemote("setCheckpoint", checkpointPos.x, checkpointPos.y, checkpointPos.z);
-            mp.gui.chat.push("Checkpoint berhasil disimpan!");
-        }
+    let playerPos = mp.players.local.position;
+    let dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z,
+                                    checkpointPos.x, checkpointPos.y, checkpointPos.z);
+
+    if (dist < 2.0) {
+        mp.events.callRemote("setCheckpoint", checkpointPos.x, checkpointPos.y, checkpointPos.z);
+        mp.gui.chat.push("Checkpoint berhasil disimpan!");
     }
-});
+}
+mp.keys.bind(0x45, true, saveCheckpointHandler); // E
 
 // =======================
 //  RENDER 3D TEXT PROMPT
 // =======================
-mp.events.add("render", () => {
-    if (checkpointPos) {
-        const playerPos = mp.players.local.position;
-        const dist = mp.game.system.vdist(
-            playerPos.x, playerPos.y, playerPos.z,
-            checkpointPos.x, checkpointPos.y, checkpointPos.z
-        );
+function renderHandler() {
+    if (!checkpointPos) return;
 
-        if (dist < 5.0) {
-            mp.game.graphics.drawText("Tekan ~g~E~w~ untuk Save Checkpoint",
-                [checkpointPos.x, checkpointPos.y, checkpointPos.z + 1.0],
-                {
-                    font: 4,
-                    color: [255, 255, 255, 200],
-                    scale: [0.35, 0.35],
-                    outline: true,
-                    centre: true
-                });
-        }
+    const playerPos = mp.players.local.position;
+    const dist = mp.game.system.vdist(playerPos.x, playerPos.y, playerPos.z,
+                                      checkpointPos.x, checkpointPos.y, checkpointPos.z);
+
+    if (dist < 5.0) {
+        mp.game.graphics.drawText("Tekan E untuk Save Checkpoint",
+            [checkpointPos.x, checkpointPos.y, checkpointPos.z + 1.0],
+            {
+                font: 4,
+                color: [255, 255, 255, 200],
+                scale: [0.35, 0.35],
+                outline: true,
+                centre: true
+            });
     }
-});
+}
+mp.events.add("render", renderHandler);
 
 // =======================
 //  INVENTORY SYSTEM (TAB)
 // =======================
-mp.keys.bind(0x09, true, function () { // Tekan TAB untuk buka Inventori
+function toggleInventoryHandler() {
     if (!inventoryOpen) {
         mp.events.callRemote("requestInventory");
     } else {
@@ -96,9 +97,10 @@ mp.keys.bind(0x09, true, function () { // Tekan TAB untuk buka Inventori
         inventoryOpen = false;
         mp.gui.cursor.show(false, false);
     }
-});
+}
+mp.keys.bind(0x09, true, toggleInventoryHandler); // TAB
 
-mp.events.add("showInventory", (invData) => {
+function showInventoryHandler(invData) {
     let items = JSON.parse(invData);
 
     if (invBrowser) {
@@ -114,4 +116,5 @@ mp.events.add("showInventory", (invData) => {
 
     mp.gui.cursor.show(true, true);
     inventoryOpen = true;
-});
+}
+mp.events.add("showInventory", showInventoryHandler);
